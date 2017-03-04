@@ -1,31 +1,65 @@
 <?xml version="1.0"?>
 <schema version="0.3">
 
-	<table name="MigrationBatches">
-	
-		<field name="id" type="I">
-			<autoincrement />
+	<table name="MigrationExportBatches">
+
+		<field name="id" type="C" size="36">
 			<key />
-			<unsigned />
 		</field>
 
 		<field name="timestamp" type="T"></field>
-		<field name="description"  type="X"></field>
+		<field name="notes"  type="X"></field>
 		
 	</table>
 
-	<table name="MigrationBatchPages">
+	<table name="MigrationExportBatchObjectCollections">
 
-		<field name="batchID" type="I">
+		<field name="batch_id" type="C" size="36">
+			<key />
+		</field>
+
+		<field name="collection_id" type="C" size="36">
+			<key />
+		</field>
+
+	</table>
+
+	<table name="MigrationExportObjectCollections">
+
+		<field name="id" type="C" size="36">
+			<key />
+		</field>
+
+		<field name="type" type="C" size="255">
+		</field>
+
+	</table>
+
+
+	<table name="MigrationExportItems">
+
+		<field name="id" type="I">
 			<key />
 			<unsigned />
 		</field>
 
-		<field name="cID" type="I">
+		<field name="collection_id" type="C" size="36">
 			<key />
+		</field>
+
+		<field name="type" type="C" size="255">
+		</field>
+
+		<field name="item_id" type="I">
 			<unsigned />
 		</field>
 
+		<field name="handle" type="C" size="255">
+		</field>
+
+
+		<field name="stack_type" type="C" size="255">
+		</field>
 
 	</table>
 

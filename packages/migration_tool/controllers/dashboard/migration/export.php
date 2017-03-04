@@ -2,10 +2,10 @@
 
 Loader::model('migration_batch', 'migration_tool');
 
-class DashboardMigrationBatchesController extends DashboardBaseController
+class DashboardMigrationExportController extends DashboardBaseController
 {
 
-    public function update_batch()
+    public function delete_batch()
     {
         $id = $_POST['id'];
         if ($id) {
@@ -14,18 +14,17 @@ class DashboardMigrationBatchesController extends DashboardBaseController
         if (!is_object($batch)) {
             $this->error->add(t('Invalid Batch'));
         }
-        if (!$this->token->validate("update_batch")) {
-            $this->error->add($this->token->getErrorMessage());
-        }
         if (!$this->error->has()) {
-            switch($_POST['action']) {
-                case 'delete':
-                    $batch->delete();
-                    $this->redirect('/dashboard/migration/batches', 'batch_deleted');
-                    break;
+            if (!$this->token->validate('delete_batch')) {
+                $this->error->add($this->token->getErrorMessage());
             }
         }
-        $this->view_batch($_POST['id']);
+        if (!$this->error->has()) {
+            $batch->delete();
+            $this->redirect('/dashboard/migration/batches', 'batch_deleted');
+            exit;
+        }
+        $this->view();
     }
 
     public function remove_from_batch()
@@ -58,6 +57,32 @@ class DashboardMigrationBatchesController extends DashboardBaseController
         exit;
     }
 
+    public function add_to_batch($id = null)
+    {
+        $batch = MigrationBatch::getByID($id);
+        if (is_object($batch)) {
+
+            $exporters = new ExportManager();
+            if (!empty($_REQUEST['item_type'])) {
+                $selectedItemType = $exporters->driver($_REQUEST['item_type']);
+                if (is_object($selectedItemType)) {
+                    $this->set('selectedItemType', $selectedItemType);
+                }
+            }
+            $drivers = $exporters->getDrivers();
+            usort($drivers, function ($a, $b) {
+                return strcasecmp($a->getPluralDisplayName(), $b->getPluralDisplayName());
+            });
+            $this->set('drivers', $drivers);
+            $this->set('batch', $batch);
+            $this->set('request', $this->request);
+            $this->set('pageTitle', t('Add To Batch'));
+            $this->render('/dashboard/system/migration/add_to_export_batch');
+        } else {
+            $this->view();
+        }
+    }
+
     public function view_batch($id = null)
     {
         if ($id) {
@@ -65,7 +90,6 @@ class DashboardMigrationBatchesController extends DashboardBaseController
         }
         if (is_object($batch)) {
             $this->set('batch', $batch);
-            $this->set('pages', $batch->getPages());
         }
     }
 
@@ -83,8 +107,8 @@ class DashboardMigrationBatchesController extends DashboardBaseController
 
     public function submit() {
         if ($this->token->validate("submit")) {
-            $batch = MigrationBatch::create($_POST['description']);
-            $this->redirect('/dashboard/migration/batches', 'view_batch', $batch->getID());
+            $batch = MigrationBatch::create($_POST['notes']);
+            $this->redirect('/dashboard/migration/export', 'view_batch', $batch->getID());
         } else {
             $this->error->add($this->token->getErrorMessage());
         }

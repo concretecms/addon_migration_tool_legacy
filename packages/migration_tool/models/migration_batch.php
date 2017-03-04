@@ -4,17 +4,16 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 class MigrationBatch extends Object
 {
     protected $id;
-    protected $description;
+    protected $notes;
     protected $timestamp;
 
     /**
      * @return mixed
      */
-    public function getDescription()
+    public function getNotes()
     {
-        return $this->description;
+        return $this->notes;
     }
-
 
     /**
      * @return mixed
@@ -33,7 +32,7 @@ class MigrationBatch extends Object
     public static function getList()
     {
         $db = Loader::db();
-        $r = $db->Execute('select id from MigrationBatches order by id asc');
+        $r = $db->Execute('select id from MigrationExportBatches order by id asc');
         $batches = array();
         while ($row = $r->FetchRow()) {
             $batch = self::getByID($row['id']);
@@ -42,36 +41,47 @@ class MigrationBatch extends Object
         return $batches;
     }
 
-    public function delete()
-    {
-        $db = Loader::db();
-        $db->Execute('delete from MigrationBatches where id = ?', array($this->getID()));
-        $db->Execute('delete from MigrationBatchPages where batchID = ?', array($this->getID()));
-    }
-
-
-    public static function create($description)
+    public static function create($notes)
     {
         $db = Loader::db();
         $timestamp = date("Y-m-d H:i:s");
-        $db->Execute('insert into MigrationBatches (timestamp, description) values (?, ?)', array(
+        $id = $db->GetOne('select uuid()');
+        $db->Execute('insert into MigrationExportBatches (id, timestamp, notes) values (?, ?, ?)', array(
+            $id,
             $timestamp,
-            $description
+            $notes
         ));
-        $id = $db->Insert_ID();
         return self::getByID($id);
     }
 
     public static function getByID($id)
     {
         $db = Loader::db();
-        $r = $db->GetRow('select * from MigrationBatches where id = ?', array($id));
+        $r = $db->GetRow('select * from MigrationExportBatches where id = ?', array($id));
         if ($r && $r['id']) {
             $o = new MigrationBatch();
             $o->setPropertiesFromArray($r);
             return $o;
         }
     }
+
+    public function hasRecords()
+    {
+        $db = Loader::db();
+        $cnt = $db->getOne('select count(collection_id) from MigrationExportBatchObjectCollections where batch_id = ?', array($this->id));
+        return $cnt > 0;
+    }
+
+    public function delete()
+    {
+        $db = Loader::db();
+        $db->Execute('delete from MigrationExportBatches where id = ?', array($this->getID()));
+    }
+
+    /*
+
+
+
 
     public function addPageID($cID)
     {
@@ -115,6 +125,6 @@ class MigrationBatch extends Object
         Loader::library('migration_batch_exporter', 'migration_tool');
         $exporter = new MigrationBatchExporter($this);
         return $exporter;
-    }
+    }*/
 
 }

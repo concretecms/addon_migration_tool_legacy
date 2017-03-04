@@ -7,6 +7,8 @@ class DashboardMigrationBatchesExportController extends DashboardBaseController
 
     public function view($id = null)
     {
+        @ini_set("memory_limit", "-1");
+        @set_time_limit(0);
         if ($id) {
             $batch = MigrationBatch::getByID($id);
         }
@@ -22,6 +24,8 @@ class DashboardMigrationBatchesExportController extends DashboardBaseController
 
     public function do_export($id = null)
     {
+        @ini_set("memory_limit", "-1");
+        @set_time_limit(0);
         if ($id) {
             $batch = MigrationBatch::getByID($id);
         }
@@ -40,6 +44,8 @@ class DashboardMigrationBatchesExportController extends DashboardBaseController
 
     public function download_files()
     {
+        @ini_set("memory_limit", "-1");
+        @set_time_limit(0);
         $id = $_POST['id'];
         if ($id) {
             $batch = MigrationBatch::getByID($id);
@@ -96,7 +102,7 @@ class DashboardMigrationBatchesExportController extends DashboardBaseController
                 $exec .= ' 2>&1';
                 @exec($exec, $output, $rc);
                 if($rc !== 0) {
-                    throw new Exception(t('External zip failed. Error description: %s', implode("\n", $outout)));
+                    throw new Exception(t('External zip failed. Error description: %s', implode("\n", $output)));
                 }
             }
             $fh->forceDownload($filename);

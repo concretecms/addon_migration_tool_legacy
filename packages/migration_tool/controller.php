@@ -19,14 +19,28 @@ class MigrationToolPackage extends Package
         return t('Migration Tool');
     }
 
+    public function on_start()
+    {
+        $classes = array(
+            'ExportManager' => array('library', 'Export/ExportManager', 'migration_tool'),
+            'AbstractExportType' => array('library', 'Export/Type/AbstractExportType', 'migration_tool'),
+            'SinglePageExportType' => array('library', 'Export/Type/SinglePageExportType', 'migration_tool'),
+            'PageExportType' => array('library', 'Export/Type/PageExportType', 'migration_tool'),
+            'StackExportType' => array('library', 'Export/Type/StackExportType', 'migration_tool'),
+            'ExportTypeInterface' => array('library', 'Export/Type/ExportTypeInterface', 'migration_tool'),
+            'ExportSearchResultFormatterInterface' => array('library', 'Export/SearchResult/ExportSearchResultFormatterInterface', 'migration_tool'),
+            'StandardExportSearchResultFormatter' => array('library', 'Export/SearchResult/StandardExportSearchResultFormatter', 'migration_tool'),
+            'StandardExportSearchResultFormatterInterface' => array('library', 'Export/SearchResult/StandardExportSearchResultFormatterInterface', 'migration_tool'),
+        );
+        Loader::registerAutoload($classes);
+
+    }
     public function install()
     {
         $pkg = parent::install();
         Loader::model('single_page');
         SinglePage::add('/dashboard/migration', $pkg);
-        SinglePage::add('/dashboard/migration/batches', $pkg);
-        SinglePage::add('/dashboard/migration/batches/add_pages', $pkg);
-        SinglePage::add('/dashboard/migration/batches/export', $pkg);
+        SinglePage::add('/dashboard/migration/export', $pkg);
     }
 
 }
