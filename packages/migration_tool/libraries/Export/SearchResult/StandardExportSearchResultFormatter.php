@@ -9,12 +9,12 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
     protected $collection;
     protected $request;
 
-    public function __construct(StandardFormatterTypeInterface $type, Batch $batch)
+    public function __construct(StandardExportSearchResultFormatterInterface $type, MigrationBatch $batch)
     {
         $this->itemType = $type;
         $this->batch = $batch;
         $this->collection = $this->batch->getObjectCollection($type->getHandle());
-        $this->request = Request::createFromGlobals();
+        $this->request = $_REQUEST;
     }
 
     /**
@@ -28,7 +28,7 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
     /**
      * @param mixed $request
      */
-    public function setRequest(Request $request)
+    public function setRequest($request)
     {
         $this->request = $request;
     }
@@ -45,20 +45,22 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
 
     public function hasSearchResults()
     {
-        if (!is_object($this->getRequest())) {
+        if (!isset($this->request)) {
             throw new \RuntimeException(t('Request must be passed to the StandardFormatter'));
         }
 
+        $request = $this->getRequest();
+
         if (!$this->hasSearchForm()) {
             return true;
-        } elseif ($this->getRequest()->query->has('search_form_submit')) {
+        } elseif (!empty($request['search_form_submit'])) {
             return true;
         }
     }
 
     public function displaySearchForm()
     {
-        echo \View::element('export/search/' . $this->itemType->getHandle(), array(
+        echo Loader::element('export/search/' . $this->itemType->getHandle(), array(
             'formatter' => $this,
             'batch' => $this->batch,
             'collection' => $this->collection,
@@ -68,7 +70,7 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
 
     public function displayBatchResults()
     {
-        echo \View::element('export/results/standard_list', array(
+        echo Loader::element('export/results/standard_list', array(
             'formatter' => $this,
             'batch' => $this->batch,
             'collection' => $this->collection,
@@ -81,7 +83,7 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
 
     public function displaySearchResults()
     {
-        echo \View::element('export/results/standard_list', array(
+        echo Loader::element('export/results/standard_list', array(
             'formatter' => $this,
             'batch' => $this->batch,
             'collection' => $this->collection,

@@ -1,4 +1,4 @@
-<?
+<?php
 defined('C5_EXECUTE') or die(_("Access Denied."));
 $form = Loader::helper('form');
 ?>
@@ -6,10 +6,131 @@ $form = Loader::helper('form');
 
 <?=Loader::helper('concrete/dashboard')->getDashboardPaneHeaderWrapper(t('Migration Tool'))?>
 
-<? if ($this->controller->getTask() == 'view_batch' && $batch) { ?>
+<?php if ($this->controller->getTask() == 'add_to_batch') { ?>
+
+    <div class="ccm-dashboard-header-buttons well">
+        <a href="<?=View::action('view_batch', $batch->getID())?>" class="btn btn-default"><i class="fa fa-angle-double-left"></i> <?=t('Back to Batch')?></a>
+    </div>
+
+    <form method="get" action="<?=View::action('add_to_batch', $batch->getID())?>">
+        <div class="form-group">
+            <?=$form->label('item_type', t('Choose Item Type'))?>
+            <select name="item_type" class="form-control">
+                <option value=""><?=t('** Select Item')?></option>
+                <?php foreach ($drivers as $itemType) {
+                    ?>
+                    <option value="<?=$itemType->getHandle()?>"
+                            <?php if (isset($selectedItemType) && $selectedItemType->getHandle() == $itemType->getHandle()) {
+                            ?>selected<?php
+                    }
+                    ?>><?=$itemType->getPluralDisplayName()?></option>
+                    <?php
+                } ?>
+            </select>
+            <button type="submit" name="submit" class="btn btn-primary"><?=t('Go')?></button>
+        </div>
+    </form>
 
 
-    <div class="ccm-dashboard-header-buttons">
+<?php if (isset($selectedItemType)) {
+    ?>
+
+
+    <?php $formatter = $selectedItemType->getResultsFormatter($batch);
+    ?>
+
+    <?php if ($formatter->hasSearchForm()) {
+        ?>
+
+        <form method="get" action="<?=View::action('add_to_batch', $batch->getID())?>" class="clearfix">
+            <?=$form->hidden('item_type', $selectedItemType->getHandle())?>
+            <?=$form->hidden('search_form_submit', 1)?>
+
+            <?=$formatter->displaySearchForm();
+            ?>
+            <div class="form-actions">
+                <button type="submit" name="submit" class="btn pull-right btn-default"><?=t('Search')?></button>
+            </div>
+        </form>
+        <?php
+    }
+    ?>
+
+    <?php if ($formatter->hasSearchResults($request)) {
+        ?>
+        <?php if ($formatter->hasSearchForm()) {
+            ?>
+            <hr/>
+            <?php
+        }
+        ?>
+
+        <h3><?=$selectedItemType->getPluralDisplayName()?></h3>
+
+
+
+        <div class="clearfix">
+            <button disabled class="pull-right btn-default btn btn-sm" data-action="add-to-batch" type="button"><?=t('Add to Batch')?></button>
+            <h4><?=t('Results')?></h4>
+        </div>
+
+
+        <?php echo $formatter->displaySearchResults();
+        ?>
+
+        <?php
+    }
+    ?>
+
+    <script type="text/javascript">
+        $(function() {
+            $('input[data-action=select-all]').on('click', function() {
+                if ($(this).is(':checked')) {
+                    $('tbody input[type=checkbox]:enabled').prop('checked', true);
+                } else {
+                    $('tbody input[type=checkbox]:enabled').prop('checked', false);
+                }
+                $('tbody input[type=checkbox]:enabled').trigger('change');
+            });
+
+            $('tbody input[type=checkbox]').on('change', function() {
+                if ($('tbody input[type=checkbox]:checked').length) {
+                    $('button[data-action=add-to-batch]').prop('disabled', false);
+                } else {
+                    $('button[data-action=add-to-batch]').prop('disabled', true);
+                }
+            });
+
+            $('button[data-action=add-to-batch]').on('click', function() {
+                var $checkboxes = $('input[data-checkbox=batch-item]');
+                if ($checkboxes.length) {
+                    var data = $checkboxes.serializeArray();
+                    jQuery.fn.dialog.showLoader();
+                    data.push({'name': 'batch_id', 'value': '<?=$batch->getID()?>'});
+                    data.push({'name': 'item_type', 'value': '<?=$selectedItemType->getHandle()?>'});
+                    data.push({'name': 'ccm_token', 'value': '<?=Loader::helper('validation/token')->generate('add_items_to_batch')?>'});
+
+                    $.post('<?=View::action('add_items_to_batch')?>', data, function(r) {
+                        jQuery.fn.dialog.hideLoader();
+                        if (r.error) {
+                            alert(r.messages.join('<br>'));
+                        } else if (r.pages.length) {
+                            alert('<?=t('Items added successfully.')?>');
+                        }
+                    }, 'json');
+                }
+            });
+
+        });
+    </script>
+
+    <?php
+} ?>
+
+<?php } else if ($this->controller->getTask() == 'view_batch' && $batch) { ?>
+
+
+    <div class="ccm-dashboard-header-buttons well">
         <div class="btn-group" role="group">
             <a href="<?=View::action('add_to_batch', $batch->getId())?>" class="btn btn-default"><?=t("Add Content to Batch")?></a>
             <button data-action="remove-from-batch" disabled class="btn btn-default"><?=t('Remove Selected')?></button>

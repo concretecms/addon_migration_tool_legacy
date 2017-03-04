@@ -22,6 +22,9 @@ class MigrationToolPackage extends Package
     public function on_start()
     {
         $classes = array(
+            'MigrationBatch' => array('model', 'MigrationBatch', 'migration_tool'),
+            'MigrationBatchObjectCollection' => array('model', 'MigrationBatchObjectCollection', 'migration_tool'),
+            'MigrationBatchItem' => array('model', 'MigrationBatchItem', 'migration_tool'),
             'ExportManager' => array('library', 'Export/ExportManager', 'migration_tool'),
             'AbstractExportType' => array('library', 'Export/Type/AbstractExportType', 'migration_tool'),
             'SinglePageExportType' => array('library', 'Export/Type/SinglePageExportType', 'migration_tool'),

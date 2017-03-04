@@ -54,6 +54,11 @@ class MigrationBatch extends Object
         return self::getByID($id);
     }
 
+    public function getObjectCollection()
+    {
+        return array();
+    }
+
     public static function getByID($id)
     {
         $db = Loader::db();

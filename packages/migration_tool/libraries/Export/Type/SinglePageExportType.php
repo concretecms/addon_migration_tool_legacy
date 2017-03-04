@@ -23,7 +23,7 @@ class SinglePageExportType extends AbstractExportType
         }
     }
 
-    public function getResultColumns(ExportItem $exportItem)
+    public function getResultColumns(MigrationBatchItem $exportItem)
     {
         $c = \Page::getByID($exportItem->getItemIdentifier());
 
@@ -39,7 +39,8 @@ class SinglePageExportType extends AbstractExportType
         foreach ($array as $id) {
             $c = \Page::getByID($id);
             if (is_object($c) && !$c->isError()) {
-                $page = new \PortlandLabs\Concrete5\MigrationTool\Entity\Export\SinglePage();
+                $page = new MigrationBatchItem();
+                $page->setItemIdentifier('page');
                 $page->setItemId($c->getCollectionID());
                 $items[] = $page;
             }
@@ -48,7 +49,7 @@ class SinglePageExportType extends AbstractExportType
         return $items;
     }
 
-    public function getResults(Request $request)
+    public function getResults($request)
     {
         $db = \Database::connection();
         $r = $db->Execute('select cID from Pages where cFilename is not null and cFilename <> "" and cID not in (select cID from Stacks) order by cID asc');

@@ -13,15 +13,14 @@ class PageExportType extends SinglePageExportType
         }
     }
 
-    public function getResults(Request $request)
+    public function getResults($query)
     {
         $pl = new PageList();
-        $query = $request->query->all();
 
         $keywords = $query['keywords'];
         $ptID = $query['ptID'];
         $startingPoint = intval($query['startingPoint']);
-        $datetime = \Core::make('helper/form/date_time')->translate('datetime', $query);
+        $datetime = Loader::helper("form/date_time")->translate('datetime', $query);
         $pl->ignorePermissions();
         if ($startingPoint) {
             $parent = \Page::getByID($startingPoint, 'ACTIVE');
@@ -32,16 +31,17 @@ class PageExportType extends SinglePageExportType
         }
 
         if ($ptID) {
-            $pl->filterByPageTypeID($ptID);
+            $pl->filterByCollectionTypeID($ptID);
         }
         if ($keywords) {
             $pl->filterByKeywords($keywords);
         }
         $pl->setItemsPerPage(1000);
-        $results = $pl->getResults();
+        $results = $pl->getPage();
         $items = array();
         foreach ($results as $c) {
-            $item = new \PortlandLabs\Concrete5\MigrationTool\Entity\Export\Page();
+            $item = new MigrationBatchItem();
+            $item->setType('page');
             $item->setItemId($c->getCollectionID());
             $items[] = $item;
         }

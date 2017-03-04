@@ -8,7 +8,7 @@ interface StandardExportSearchResultFormatterInterface
 
     public function getHeaders();
 
-    public function getResults(Request $request);
+    public function getResults($request);
 
-    public function getResultColumns(ExportItem $item);
+    public function getResultColumns(MigrationBatchItem $item);
 }

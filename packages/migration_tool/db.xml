@@ -54,12 +54,9 @@
 			<unsigned />
 		</field>
 
-		<field name="handle" type="C" size="255">
+		<field name="item_handle" type="C" size="255">
 		</field>
 
-
-		<field name="stack_type" type="C" size="255">
-		</field>
 
 	</table>
 

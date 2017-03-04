@@ -9,6 +9,15 @@ class ExportManager
 		);
 	}
 
+	public function driver($handle)
+	{
+		foreach($this->getDrivers() as $driver) {
+			if ($driver->getHandle() == $handle) {
+				return $driver;
+			}
+		}
+	}
+
 	public function getDrivers()
 	{
 		$drivers = array();

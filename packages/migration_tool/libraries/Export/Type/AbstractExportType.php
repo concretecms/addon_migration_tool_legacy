@@ -11,6 +11,6 @@ abstract class AbstractExportType implements ExportTypeInterface, StandardExport
 
     public function getResultsFormatter(MigrationBatch $batch)
     {
-        return new StandardFormatter($this, $batch);
+        return new StandardExportSearchResultFormatter($this, $batch);
     }
 }

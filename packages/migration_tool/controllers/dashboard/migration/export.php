@@ -1,7 +1,4 @@
-<?
-
-Loader::model('migration_batch', 'migration_tool');
-
+<?php
 class DashboardMigrationExportController extends DashboardBaseController
 {
 
@@ -77,7 +74,6 @@ class DashboardMigrationExportController extends DashboardBaseController
             $this->set('batch', $batch);
             $this->set('request', $this->request);
             $this->set('pageTitle', t('Add To Batch'));
-            $this->render('/dashboard/system/migration/add_to_export_batch');
         } else {
             $this->view();
         }
@@ -97,6 +93,55 @@ class DashboardMigrationExportController extends DashboardBaseController
     {
         $this->set('message', t('Batch deleted.'));
         $this->view();
+    }
+
+    public function add_items_to_batch()
+    {
+        if (!$this->token->validate('add_items_to_batch')) {
+            $this->error->add($this->token->getErrorMessage());
+        }
+
+        $exporters = new ExportManager();
+        $batch = MigrationBatch::getByID($_REQUEST['batch_id']);
+
+        if (!is_object($batch)) {
+            $this->error->add(t('Invalid batch.'));
+        }
+
+        $selectedItemType = false;
+        if (!empty($_REQUEST['item_type']) && $_REQUEST['item_type']) {
+            $selectedItemType = $exporters->driver($_REQUEST['item_type']);
+        }
+
+        if (!is_object($selectedItemType)) {
+            $this->error->add(t('Invalid item type.'));
+        }
+
+        if (!$this->error->has()) {
+            $values = $_REQUEST['id'];
+            $exportItems = $selectedItemType->getItemsFromRequest($values[$selectedItemType->getHandle()]);
+            $collection = $batch->getObjectCollection($selectedItemType->getHandle());
+            if (!is_object($collection)) {
+                $collection = new MigrationBatchObjectCollection();
+                $collection->setType($selectedItemType->getHandle());
+            }
+            foreach ($exportItems as $item) {
+                if (!$collection->contains($item)) {
+                    $item->setCollection($collection);
+                    $collection->getItems()->add($item);
+                }
+            }
+
+            $this->entityManager->persist($batch);
+            $this->entityManager->flush();
+            $response = new JsonResponse($exportItems);
+
+            return $response;
+        }
+
+        $r = new EditResponse();
+        $r->setError($this->error);
+        $r->outputJSON();
     }
 
     public function view()
