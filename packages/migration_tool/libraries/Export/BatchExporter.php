@@ -18,12 +18,9 @@ class MigrationBatchExporter
 		$this->x = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?><concrete5-cif></concrete5-cif>");
 		$this->x->addAttribute('version', '1.0');
 
-		$pages = $this->batch->getPages();
-		if (count($pages)) {
-			$top = $this->x->addChild('pages');
-			foreach($pages as $c) {
-				$c->export($top);
-			}
+		foreach ($this->batch->getObjectCollections() as $collection) {
+			$type = $collection->getItemTypeObject();
+			$type->exportCollection($collection, $this->x);
 		}
 	}
 

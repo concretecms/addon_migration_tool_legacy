@@ -12,19 +12,11 @@
 		
 	</table>
 
-	<table name="MigrationExportBatchObjectCollections">
+	<table name="MigrationExportObjectCollections">
 
 		<field name="batch_id" type="C" size="36">
 			<key />
 		</field>
-
-		<field name="collection_id" type="C" size="36">
-			<key />
-		</field>
-
-	</table>
-
-	<table name="MigrationExportObjectCollections">
 
 		<field name="id" type="C" size="36">
 			<key />
@@ -38,13 +30,12 @@
 
 	<table name="MigrationExportItems">
 
-		<field name="id" type="I">
+		<field name="id" type="C" size="36">
 			<key />
 			<unsigned />
 		</field>
 
 		<field name="collection_id" type="C" size="36">
-			<key />
 		</field>
 
 		<field name="type" type="C" size="255">

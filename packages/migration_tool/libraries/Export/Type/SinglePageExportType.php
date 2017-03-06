@@ -18,7 +18,7 @@ class SinglePageExportType extends AbstractExportType
         foreach ($collection->getItems() as $page) {
             $c = \Page::getByID($page->getItemIdentifier());
             if (is_object($c) && !$c->isError()) {
-                $this->exporter->export($c, $node);
+                $c->export($node);
             }
         }
     }
@@ -40,7 +40,7 @@ class SinglePageExportType extends AbstractExportType
             $c = \Page::getByID($id);
             if (is_object($c) && !$c->isError()) {
                 $page = new MigrationBatchItem();
-                $page->setItemIdentifier('page');
+                $page->setType('page');
                 $page->setItemId($c->getCollectionID());
                 $items[] = $page;
             }

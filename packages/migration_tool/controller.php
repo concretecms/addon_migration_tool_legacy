@@ -6,7 +6,7 @@ class MigrationToolPackage extends Package
 {
 
     protected $pkgHandle = 'migration_tool';
-    protected $appVersionRequired = '5.5.0';
+    protected $appVersionRequired = '5.6.3.5b1';
     protected $pkgVersion = '0.6.1';
 
     public function getPackageDescription()
@@ -22,6 +22,7 @@ class MigrationToolPackage extends Package
     public function on_start()
     {
         $classes = array(
+            'MigrationBatchExporter' => array('library', 'Export/BatchExporter', 'migration_tool'),
             'MigrationBatch' => array('model', 'MigrationBatch', 'migration_tool'),
             'MigrationBatchObjectCollection' => array('model', 'MigrationBatchObjectCollection', 'migration_tool'),
             'MigrationBatchItem' => array('model', 'MigrationBatchItem', 'migration_tool'),

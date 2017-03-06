@@ -114,7 +114,7 @@ $form = Loader::helper('form');
                         jQuery.fn.dialog.hideLoader();
                         if (r.error) {
                             alert(r.messages.join('<br>'));
-                        } else if (r.pages.length) {
+                        } else {
                             alert('<?=t('Items added successfully.')?>');
                         }
                     }, 'json');
@@ -126,6 +126,83 @@ $form = Loader::helper('form');
 
     <?php
 } ?>
+
+<?php } else if ($this->controller->getTask() == 'export_batch') { ?>
+
+    <div class="ccm-dashboard-header-buttons well">
+        <a href="<?=View::action('view_batch', $batch->getID())?>" class="btn btn-default"><i class="fa fa-angle-double-left"></i> <?=t('Back to Batch')?></a>
+    </div>
+
+    <?php if (count($files)) {
+        ?>
+
+        <script type="text/javascript">
+            $(function() {
+                $('input[data-checkbox=select-all]').on('click', function() {
+                    if ($(this).is(':checked')) {
+                        $('tbody input[type=checkbox]:enabled').prop('checked', true);
+                    } else {
+                        $('tbody input[type=checkbox]:enabled').prop('checked', false);
+                    }
+                    $('tbody input[type=checkbox]:enabled').trigger('change');
+                });
+
+                $('tbody input[type=checkbox]').on('change', function() {
+                    if ($('tbody input[type=checkbox]:checked').length) {
+                        $('button[data-action=download-files]').prop('disabled', false);
+                    } else {
+                        $('button[data-action=download-files]').prop('disabled', true);
+                    }
+                });
+
+            });
+        </script>
+
+        <form method="post" action="<?=View::url('/dashboard/migration/export', 'download_files')?>">
+            <input type="hidden" name="id" value="<?=$batch->getID()?>">
+            <?=Loader::helper('validation/token')->output('download_files')?>
+            <button style="float: right" disabled class="btn small btn-sm" data-action="download-files" type="submit"><?=t('Download Files')?></button>
+            <h3><?=t('Files')?></h3>
+
+            <table class="table table-striped zebra-striped">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" data-checkbox="select-all"></th>
+                    <th><?=t('ID')?></th>
+                    <th style="width: 100%"><?=t('Filename')?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($files as $file) {
+                    ?>
+                    <tr>
+                        <td><input type="checkbox" data-checkbox="batch-file" name="batchFileID[]" value="<?=$file->getFileID()?>"></td>
+                        <td><?=$file->getFileID()?></td>
+                        <td><?=$file->getFileName()?></td>
+                    </tr>
+                    <?php
+                }
+                ?>
+                </tbody>
+            </table>
+        </form>
+        <?php
+    } else {
+        ?>
+        <h3><?=t('Files')?></h3>
+        <p><?=t('No referenced files found.')?></p>
+        <?php
+    } ?>
+
+    <h3><?=t('Content XML')?></h3>
+    <form method="post" action="<?=View::action('export_batch_xml', $batch->getID())?>">
+        <div class="btn-group">
+            <button type="submit" name="view" value="1" class="btn btn-default"><?=t('View XML')?></button>
+            <button type="submit" name="download" value="1" class="btn btn-default"><?=t('Download XML')?></button>
+        </div>
+    </form>
+
+
 
 <?php } else if ($this->controller->getTask() == 'view_batch' && $batch) { ?>
 
@@ -241,90 +318,6 @@ $form = Loader::helper('form');
 
         });
     </script>
-
-
-    <?php /* ?>
-    <script type="text/javascript">
-        $(function() {
-            $('input.ccm-migration-select-all').on('click', function() {
-                if ($(this).is(':checked')) {
-                    $('tbody input[type=checkbox]:enabled').prop('checked', true);
-                } else {
-                    $('tbody input[type=checkbox]:enabled').prop('checked', false);
-                }
-                $('tbody input[type=checkbox]:enabled').trigger('change');
-            });
-
-            $('tbody input[type=checkbox]').on('change', function() {
-                if ($('tbody input[type=checkbox]:checked').length) {
-                    $('button[data-action=remove-from-batch]').prop('disabled', false);
-                } else {
-                    $('button[data-action=remove-from-batch]').prop('disabled', true);
-                }
-            });
-
-            $('button[data-action=remove-from-batch]').on('click', function() {
-                var $checkboxes = $('input[data-checkbox=batch-page]');
-                if ($checkboxes.length) {
-                    var data = $checkboxes.serializeArray();
-                    jQuery.fn.dialog.showLoader();
-                    data.push({'name': 'id', 'value': '<?=$batch->getID()?>'});
-                    data.push({'name': 'ccm_token', 'value': '<?=Loader::helper('validation/token')->generate('remove_from_batch')?>'});
-                    $.post('<?=View::url('/dashboard/migration/batches', 'remove_from_batch')?>', data, function(r) {
-                        jQuery.fn.dialog.hideLoader();
-                        if (r.error) {
-                            alert(r.messages.join('<br>'));
-                        } else if (r.pages.length) {
-                            for (var i = 0; i < r.pages.length; i++) {
-                                var cID = r.pages[i];
-                                $('tr[data-batch-page=' + cID + ']').remove();
-                            }
-                        }
-                    }, 'json');
-                }
-            });
-        });
-    </script>
-
-    <form method="post" action="<?=View::url('/dashboard/migration/batches', 'update_batch')?>">
-    <input type="hidden" name="id" value="<?=$batch->getID()?>">
-    <?=Loader::helper('validation/token')->output("update_batch")?>
-    <div class="well">
-        <a href="<?=View::url('/dashboard/migration/batches/add_pages', $batch->getID())?>" class="btn btn-primary"><?=t('Add Pages')?></a>
-        <a href="<?=View::url('/dashboard/migration/batches/export', $batch->getID())?>" class="btn btn-primary"><?=t('Export Batch')?></a>
-        <button type="submit" onclick="return confirm('<?=t('Delete the Batch?')?>')" name="action" value="delete" class="btn danger btn-danger"><?=t('Delete Batch')?></button>
-    </div>
-
-        <? if (count($pages)) { ?>
-            <button style="float: right" disabled class="btn small btn-sm" data-action="remove-from-batch" type="button"><?=t('Remove from Batch')?></button>
-            <h3><?=t('Pages')?></h3>
-        <table class="table table-striped zebra-striped">
-            <thead>
-            <tr>
-                <th style="width: 20px"><input type="checkbox" class="ccm-migration-select-all"></th>
-                <th><?=t('Name')?></th>
-                <th><?=t('Description')?></th>
-            </tr>
-            </thead>
-            <tbody>
-            <? foreach($pages as $page) { ?>
-                <tr data-batch-page="<?=$page->getCollectionID()?>">
-                    <td><input type="checkbox" data-checkbox="batch-page" name="batchPageID[]" value="<?=$page->getCollectionID()?>"></td>
-                    <td><a target="_blank" href="<?=Loader::helper('navigation')->getLinkToCollection($page)?>"><?=$page->getCollectionName()?></td>
-                    <td><?=$page->getCollectionDescription()?></td>
-                </tr>
-            <? } ?>
-            </tbody>
-        </table>
-    <? } else { ?>
-            <h3><?=t('Pages')?></h3>
-        <p><?=t('No pages in batch.')?></p>
-    <? } ?>
-    </form>
- */
-?>
-
-
 
 <?php } else { ?>
 

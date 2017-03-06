@@ -8,7 +8,7 @@ class PageExportType extends SinglePageExportType
         foreach ($collection->getItems() as $page) {
             $c = \Page::getByID($page->getItemIdentifier());
             if (is_object($c) && !$c->isError()) {
-                $this->exporter->export($c, $node);
+                $c->export($node);
             }
         }
     }

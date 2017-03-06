@@ -54,11 +54,30 @@ class MigrationBatch extends Object
         return self::getByID($id);
     }
 
-    public function getObjectCollection()
+    public function getObjectCollection($type)
     {
-        return array();
+        $db = Loader::db();
+        $id = $db->getOne('select id from MigrationExportObjectCollections where batch_id = ? and type = ?', array(
+            $this->getID(), $type
+        ));
+        if ($id) {
+            return MigrationBatchObjectCollection::getByID($id);
+        }
     }
 
+    public function getObjectCollections()
+    {
+        $collections = array();
+        $db = Loader::db();
+        $r = $db->execute('select id from MigrationExportObjectCollections where batch_id = ?', array($this->getID()));
+        while ($row = $r->fetchRow()) {
+            $collection = MigrationBatchObjectCollection::getById($row['id']);
+            if (is_object($collection)) {
+                $collections[] = $collection;
+            }
+        }
+        return $collections;
+    }
     public static function getByID($id)
     {
         $db = Loader::db();
@@ -73,63 +92,26 @@ class MigrationBatch extends Object
     public function hasRecords()
     {
         $db = Loader::db();
-        $cnt = $db->getOne('select count(collection_id) from MigrationExportBatchObjectCollections where batch_id = ?', array($this->id));
+        $cnt = $db->getOne('select count(id) from MigrationExportObjectCollections where batch_id = ?', array($this->id));
         return $cnt > 0;
     }
 
     public function delete()
     {
+        $collections = $this->getObjectCollections();
+        foreach($collections as $collection) {
+            $collection->delete();
+        }
+
         $db = Loader::db();
         $db->Execute('delete from MigrationExportBatches where id = ?', array($this->getID()));
     }
 
-    /*
-
-
-
-
-    public function addPageID($cID)
-    {
-        $db = Loader::db();
-        if (!$this->containsPageID($cID)) {
-            $db->Execute('insert into MigrationBatchPages (cID, batchID) values (?, ?)', array(
-                $cID, $this->getID())
-            );
-        }
-    }
-
-    public function removePageID($cID)
-    {
-        $db = Loader::db();
-        $db->Execute('delete from MigrationBatchPages where cID = ? and batchID = ?', array($cID, $this->getID()));
-    }
-
-    public function getPages()
-    {
-        $db = Loader::db();
-        $r = $db->Execute('select cID from MigrationBatchPages where batchID = ? order by cID asc', array($this->getID()));
-        $pages = array();
-        while ($row = $r->FetchRow()) {
-            $c = Page::getByID($row['cID']);
-            if (is_object($c) && !$c->isError()) {
-                $pages[] = $c;
-            }
-        }
-        return $pages;
-    }
-
-    public function containsPageID($cID)
-    {
-        $db = Loader::db();
-        $existing = $db->GetOne('select cID from MigrationBatchPages where cID = ? and batchID = ?', array($cID, $this->getID()));
-        return $existing;
-    }
-
     public function getExporter()
     {
-        Loader::library('migration_batch_exporter', 'migration_tool');
         $exporter = new MigrationBatchExporter($this);
         return $exporter;
-    }*/
+    }
+
 
 }
