@@ -5,7 +5,8 @@ class ExportManager
 	protected function getDriverArray()
 	{
 		return array(
-			'page'
+			'page',
+			'stack'
 		);
 	}
 
