@@ -48,7 +48,9 @@ class DashboardMigrationExportController extends DashboardBaseController
             } else {
                 header('Content-type: text/xml');
             }
-            $xml = $exporter->getContentXML();
+            // I feel like this html_entity_decode is risky but how else am I to get rid of the double
+            // quoting &amp;amp; problem?
+            $xml = html_entity_decode($exporter->getContentXML(), ENT_NOQUOTES, APP_CHARSET);
             echo $xml;
             exit;
         } else {

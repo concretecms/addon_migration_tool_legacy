@@ -32,7 +32,6 @@
 
 		<field name="id" type="C" size="36">
 			<key />
-			<unsigned />
 		</field>
 
 		<field name="collection_id" type="C" size="36">

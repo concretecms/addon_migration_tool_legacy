@@ -7,11 +7,11 @@ class MigrationToolPackage extends Package
 
     protected $pkgHandle = 'migration_tool';
     protected $appVersionRequired = '5.6.3.5b1';
-    protected $pkgVersion = '0.6.1';
+    protected $pkgVersion = '0.9.7';
 
     public function getPackageDescription()
     {
-        return t('Generates content from a 5.5 or greater concrete5 site for import into a modern concrete5 installation.');
+        return t('Generates content from a legacy 5.6 concrete5 site for import into a modern concrete5 installation.');
     }
 
     public function getPackageName()
