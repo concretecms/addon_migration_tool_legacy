@@ -322,7 +322,7 @@ $form = Loader::helper('form');
 <?php } else { ?>
 
     <h3><?=t('Batches')?></h3>
-    <? if (count($batches)) { ?>
+    <?php if (count($batches)) { ?>
 
     <table class="table table-striped zebra-striped">
     <thead>
@@ -331,17 +331,17 @@ $form = Loader::helper('form');
             <th><?=t('Notes')?></th>
         </tr>
     </thead>
-        <? foreach($batches as $batch) { ?>
+        <?php foreach($batches as $batch) { ?>
             <tr>
                 <td style="width: 20%; white-space: nowrap"><a href="<?=View::url('/dashboard/migration/export', 'view_batch', $batch->getID())?>"><?=$batch->getTimestamp()?></td>
                 <td><?=$batch->getNotes()?></td>
             </tr>
-        <? } ?>
+        <?php } ?>
     </table>
 
-    <? } else { ?>
+    <?php } else { ?>
         <p><?=t("You have not added any content batches.")?></p>
-    <? } ?>
+    <?php } ?>
 
     <hr/>
     <form method="post" action="<?=$this->action('submit')?>">
@@ -361,5 +361,5 @@ $form = Loader::helper('form');
 
     <div class="ccm-spacer"></div>
 
-<? } ?>
+<?php } ?>
 <?=Loader::helper('concrete/dashboard')->getDashboardPaneFooterWrapper();?>
