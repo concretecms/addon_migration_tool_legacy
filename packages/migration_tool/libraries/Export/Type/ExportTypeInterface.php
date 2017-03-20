@@ -1,5 +1,6 @@
 <?php
-defined('C5_EXECUTE') or die("Access Denied.");
+
+defined('C5_EXECUTE') or die('Access Denied.');
 interface ExportTypeInterface
 {
     public function getHandle();

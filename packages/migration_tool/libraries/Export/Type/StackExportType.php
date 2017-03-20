@@ -1,6 +1,6 @@
 <?php
 
-defined('C5_EXECUTE') or die("Access Denied.");
+defined('C5_EXECUTE') or die('Access Denied.');
 
 class StackExportType extends \AbstractExportType
 {
@@ -26,7 +26,7 @@ class StackExportType extends \AbstractExportType
     public function getResultColumns(MigrationBatchItem $exportItem)
     {
         $c = Stack::getByID($exportItem->getItemIdentifier());
-        switch($c->getStackType()) {
+        switch ($c->getStackType()) {
             case Stack::ST_TYPE_GLOBAL_AREA:
                 $type = t('Global Area');
                 break;
@@ -34,6 +34,7 @@ class StackExportType extends \AbstractExportType
                 $type = t('Stack');
                 break;
         }
+
         return array(
             $type,
             $c->getCollectionName(),

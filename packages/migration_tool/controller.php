@@ -1,10 +1,9 @@
 <?php
 
-defined('C5_EXECUTE') or die(_("Access Denied."));
+defined('C5_EXECUTE') or die(_('Access Denied.'));
 
 class MigrationToolPackage extends Package
 {
-
     protected $pkgHandle = 'migration_tool';
     protected $appVersionRequired = '5.6.3.5b1';
     protected $pkgVersion = '0.9.7';
@@ -37,7 +36,6 @@ class MigrationToolPackage extends Package
             'StandardExportSearchResultFormatterInterface' => array('library', 'Export/SearchResult/StandardExportSearchResultFormatterInterface', 'migration_tool'),
         );
         Loader::registerAutoload($classes);
-
     }
     public function install()
     {
@@ -46,5 +44,4 @@ class MigrationToolPackage extends Package
         SinglePage::add('/dashboard/migration', $pkg);
         SinglePage::add('/dashboard/migration/export', $pkg);
     }
-
 }

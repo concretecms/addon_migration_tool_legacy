@@ -20,7 +20,7 @@ class PageExportType extends SinglePageExportType
         $keywords = $query['keywords'];
         $ptID = $query['ptID'];
         $startingPoint = intval($query['startingPoint']);
-        $datetime = Loader::helper("form/date_time")->translate('datetime', $query);
+        $datetime = Loader::helper('form/date_time')->translate('datetime', $query);
         $pl->ignorePermissions();
         if ($startingPoint) {
             $parent = \Page::getByID($startingPoint, 'ACTIVE');

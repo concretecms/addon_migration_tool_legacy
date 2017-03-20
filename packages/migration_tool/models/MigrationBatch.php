@@ -1,5 +1,6 @@
-<?
-defined('C5_EXECUTE') or die(_("Access Denied."));
+<?php
+
+defined('C5_EXECUTE') or die(_('Access Denied.'));
 
 class MigrationBatch extends Object
 {
@@ -23,7 +24,6 @@ class MigrationBatch extends Object
         return $this->timestamp;
     }
 
-
     public function getID()
     {
         return $this->id;
@@ -38,19 +38,21 @@ class MigrationBatch extends Object
             $batch = self::getByID($row['id']);
             $batches[] = $batch;
         }
+
         return $batches;
     }
 
     public static function create($notes)
     {
         $db = Loader::db();
-        $timestamp = date("Y-m-d H:i:s");
+        $timestamp = date('Y-m-d H:i:s');
         $id = $db->GetOne('select uuid()');
         $db->Execute('insert into MigrationExportBatches (id, timestamp, notes) values (?, ?, ?)', array(
             $id,
             $timestamp,
-            $notes
+            $notes,
         ));
+
         return self::getByID($id);
     }
 
@@ -58,7 +60,7 @@ class MigrationBatch extends Object
     {
         $db = Loader::db();
         $id = $db->getOne('select id from MigrationExportObjectCollections where batch_id = ? and type = ?', array(
-            $this->getID(), $type
+            $this->getID(), $type,
         ));
         if ($id) {
             return MigrationBatchObjectCollection::getByID($id);
@@ -76,6 +78,7 @@ class MigrationBatch extends Object
                 $collections[] = $collection;
             }
         }
+
         return $collections;
     }
     public static function getByID($id)
@@ -83,8 +86,9 @@ class MigrationBatch extends Object
         $db = Loader::db();
         $r = $db->GetRow('select * from MigrationExportBatches where id = ?', array($id));
         if ($r && $r['id']) {
-            $o = new MigrationBatch();
+            $o = new self();
             $o->setPropertiesFromArray($r);
+
             return $o;
         }
     }
@@ -93,13 +97,14 @@ class MigrationBatch extends Object
     {
         $db = Loader::db();
         $cnt = $db->getOne('select count(id) from MigrationExportObjectCollections where batch_id = ?', array($this->id));
+
         return $cnt > 0;
     }
 
     public function delete()
     {
         $collections = $this->getObjectCollections();
-        foreach($collections as $collection) {
+        foreach ($collections as $collection) {
             $collection->delete();
         }
 
@@ -110,8 +115,7 @@ class MigrationBatch extends Object
     public function getExporter()
     {
         $exporter = new MigrationBatchExporter($this);
+
         return $exporter;
     }
-
-
 }

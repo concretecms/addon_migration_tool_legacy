@@ -1,6 +1,6 @@
 <?php
 
-defined('C5_EXECUTE') or die("Access Denied.");
+defined('C5_EXECUTE') or die('Access Denied.');
 
 class StandardExportSearchResultFormatter implements ExportSearchResultFormatterInterface
 {
@@ -37,7 +37,7 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
     {
         $env = Environment::get();
         $rec = $env->getRecord(
-            DIRNAME_ELEMENTS . '/export/search/' . $this->itemType->getHandle() . '.php',
+            DIRNAME_ELEMENTS.'/export/search/'.$this->itemType->getHandle().'.php',
             'migration_tool');
 
         return $rec->exists();
@@ -60,7 +60,7 @@ class StandardExportSearchResultFormatter implements ExportSearchResultFormatter
 
     public function displaySearchForm()
     {
-        echo Loader::element('export/search/' . $this->itemType->getHandle(), array(
+        echo Loader::element('export/search/'.$this->itemType->getHandle(), array(
             'formatter' => $this,
             'batch' => $this->batch,
             'collection' => $this->collection,

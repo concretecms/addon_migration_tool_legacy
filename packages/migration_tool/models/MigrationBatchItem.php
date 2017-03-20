@@ -1,9 +1,9 @@
-<?
-defined('C5_EXECUTE') or die(_("Access Denied."));
+<?php
+
+defined('C5_EXECUTE') or die(_('Access Denied.'));
 
 class MigrationBatchItem extends Object
 {
-
     protected $id;
     protected $item_identifier;
     protected $identifier;
@@ -43,7 +43,6 @@ class MigrationBatchItem extends Object
     {
         $this->identifier = $identifier;
     }
-
 
     /**
      * @return mixed
@@ -133,6 +132,7 @@ class MigrationBatchItem extends Object
         if (isset($this->item_identifier)) {
             return $this->item_identifier;
         }
+
         return $this->item_id;
     }
 
@@ -151,6 +151,7 @@ class MigrationBatchItem extends Object
         if ($row && is_array($row)) {
             $o = new static();
             $o->setPropertiesFromArray($row);
+
             return $o;
         }
     }
@@ -173,13 +174,9 @@ class MigrationBatchItem extends Object
             'id' => $this->getId(),
             'type' => $this->getType(),
             'item_id' => $this->getItemId(),
-            'item_handle' => $this->getItemHandle()
+            'item_handle' => $this->getItemHandle(),
         );
 
         $db->Replace('MigrationExportItems', $data, array('id'), true);
     }
-
-
-
-
 }

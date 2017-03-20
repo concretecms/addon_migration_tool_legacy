@@ -1,7 +1,7 @@
 <?php
+
 class DashboardMigrationExportController extends DashboardBaseController
 {
-
     public function delete_batch()
     {
         $id = $_POST['id'];
@@ -62,7 +62,7 @@ class DashboardMigrationExportController extends DashboardBaseController
 
     public function download_files()
     {
-        @ini_set("memory_limit", "-1");
+        @ini_set('memory_limit', '-1');
         @set_time_limit(0);
         $id = $_POST['id'];
         if ($id) {
@@ -71,23 +71,22 @@ class DashboardMigrationExportController extends DashboardBaseController
         if (!is_object($batch)) {
             $this->error->add(t('Invalid Batch'));
         }
-        if (!$this->token->validate("download_files")) {
+        if (!$this->token->validate('download_files')) {
             $this->error->add($this->token->getErrorMessage());
         }
         $fh = Loader::helper('file');
         $vh = Loader::helper('validation/identifier');
         if (!$this->error->has()) {
-
             $temp = sys_get_temp_dir();
             if (!$temp) {
                 $temp = $fh->getTemporaryDirectory();
             }
-            $filename = $temp . '/' . $vh->getString() . '.zip';
+            $filename = $temp.'/'.$vh->getString().'.zip';
             $files = array();
             $filenames = array();
-            foreach((array) $_POST['batchFileID'] as $fID) {
+            foreach ((array) $_POST['batchFileID'] as $fID) {
                 $f = File::getByID(intval($fID));
-                if($f->isError()) {
+                if ($f->isError()) {
                     continue;
                 }
                 $fp = new Permissions($f);
@@ -98,28 +97,27 @@ class DashboardMigrationExportController extends DashboardBaseController
                     $filenames[] = basename($f->getPath());
                 }
             }
-            if(empty($files)) {
-                throw new Exception(t("None of the requested files could be found."));
+            if (empty($files)) {
+                throw new Exception(t('None of the requested files could be found.'));
             }
-            if(class_exists('ZipArchive', false)) {
-                $zip = new ZipArchive;
+            if (class_exists('ZipArchive', false)) {
+                $zip = new ZipArchive();
                 $res = $zip->open($filename, ZipArchive::CREATE);
-                if($res !== true) {
+                if ($res !== true) {
                     throw new Exception(t('Could not open with ZipArchive::CREATE'));
                 }
-                foreach($files as $f) {
+                foreach ($files as $f) {
                     $zip->addFile($f, basename($f));
                 }
                 $zip->close();
-            }
-            else {
-                $exec = escapeshellarg(DIR_FILES_BIN_ZIP) . ' -j ' . escapeshellarg($filename);
-                foreach($files as $f) {
-                    $exec .= ' ' . escapeshellarg($f);
+            } else {
+                $exec = escapeshellarg(DIR_FILES_BIN_ZIP).' -j '.escapeshellarg($filename);
+                foreach ($files as $f) {
+                    $exec .= ' '.escapeshellarg($f);
                 }
                 $exec .= ' 2>&1';
                 @exec($exec, $output, $rc);
-                if($rc !== 0) {
+                if ($rc !== 0) {
                     throw new Exception(t('External zip failed. Error description: %s', implode("\n", $output)));
                 }
             }
@@ -137,24 +135,22 @@ class DashboardMigrationExportController extends DashboardBaseController
         if (!is_object($batch)) {
             $this->error->add(t('Invalid Batch'));
         }
-        if (!$this->token->validate("remove_from_batch")) {
+        if (!$this->token->validate('remove_from_batch')) {
             $this->error->add($this->token->getErrorMessage());
         }
-        $r = new stdClass;
+        $r = new stdClass();
         if (!$this->error->has()) {
-
             $r->error = false;
             $r->pages = array();
-            foreach((array) $_POST['batchPageID'] as $cID) {
+            foreach ((array) $_POST['batchPageID'] as $cID) {
                 $r->pages[] = $cID;
                 $batch->removePageID($cID);
             }
-
         } else {
             $r->error = true;
             $r->messages = $this->error->getList();
         }
-        print Loader::helper('json')->encode($r);
+        echo Loader::helper('json')->encode($r);
         exit;
     }
 
@@ -162,7 +158,6 @@ class DashboardMigrationExportController extends DashboardBaseController
     {
         $batch = MigrationBatch::getByID($id);
         if (is_object($batch)) {
-
             $exporters = new ExportManager();
             if (!empty($_REQUEST['item_type'])) {
                 $selectedItemType = $exporters->driver($_REQUEST['item_type']);
@@ -278,7 +273,7 @@ class DashboardMigrationExportController extends DashboardBaseController
             }
 
             $json = Loader::helper('json');
-            print $json->encode($exportItems);
+            echo $json->encode($exportItems);
             exit;
         }
 
@@ -293,8 +288,9 @@ class DashboardMigrationExportController extends DashboardBaseController
         $this->set('batches', $batches);
     }
 
-    public function submit() {
-        if ($this->token->validate("submit")) {
+    public function submit()
+    {
+        if ($this->token->validate('submit')) {
             $batch = MigrationBatch::create($_POST['notes']);
             $this->redirect('/dashboard/migration/export', 'view_batch', $batch->getID());
         } else {

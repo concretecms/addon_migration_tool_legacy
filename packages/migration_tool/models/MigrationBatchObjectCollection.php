@@ -1,9 +1,9 @@
-<?
-defined('C5_EXECUTE') or die(_("Access Denied."));
+<?php
+
+defined('C5_EXECUTE') or die(_('Access Denied.'));
 
 class MigrationBatchObjectCollection
 {
-
     protected $id;
     protected $type;
     protected $batch_id;
@@ -18,6 +18,7 @@ class MigrationBatchObjectCollection
             $o->batch_id = $row['batch_id'];
             $o->id = $row['id'];
             $o->type = $row['type'];
+
             return $o;
         }
     }
@@ -41,12 +42,14 @@ class MigrationBatchObjectCollection
     public function hasRecords()
     {
         $items = $this->getItems();
+
         return count($items) > 0;
     }
 
     public function getItemTypeObject()
     {
         $exporters = new ExportManager();
+
         return $exporters->driver($this->getType());
     }
 
@@ -90,16 +93,17 @@ class MigrationBatchObjectCollection
         if (!isset($this->items)) {
             $db = Loader::db();
             $ids = $db->getCol('select id from MigrationExportItems where collection_id = ?', array(
-                $this->getID()
+                $this->getID(),
             ));
             $this->items = array();
-            foreach($ids as $id) {
+            foreach ($ids as $id) {
                 $item = MigrationBatchItem::getByID($id);
                 if (is_object($item)) {
                     $this->items[] = $item;
                 }
             }
         }
+
         return $this->items;
     }
 
@@ -110,7 +114,6 @@ class MigrationBatchObjectCollection
     {
         $this->items = $items;
     }
-
 
     public function contains(MigrationBatchItem $item)
     {
@@ -134,14 +137,11 @@ class MigrationBatchObjectCollection
     public function delete()
     {
         $items = $this->getItems();
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $item->delete();
         }
 
         $db = Loader::db();
         $db->query('delete from MigrationExportObjectCollections where id = ?', array($this->getID()));
     }
-
-
-
 }
