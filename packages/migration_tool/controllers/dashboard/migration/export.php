@@ -50,8 +50,10 @@ class DashboardMigrationExportController extends DashboardBaseController
             }
             // I feel like this html_entity_decode is risky but how else am I to get rid of the double
             // quoting &amp;amp; problem?
-            $xml = html_entity_decode($exporter->getContentXML(), ENT_NOQUOTES, APP_CHARSET);
-            echo $xml;
+            // Never mind, this creates broken XML.
+            //$xml = html_entity_decode($exporter->getContentXML(), ENT_NOQUOTES | ENT_XML1, APP_CHARSET);
+            //$xml = $exporter->getContentXML();
+            echo $exporter->getContentXML();
             exit;
         } else {
             $this->view();
