@@ -25,13 +25,15 @@ class MigrationBatchExporter
 
     public function getContentXML()
     {
+        return $this->getExporter()->asXML();
+    }
+
+    public function getExporter()
+    {
         if (!$this->parsed) {
             $this->parse();
         }
-        $xml = $this->x->asXML();
-        // this line is screwing up blocks that need to control their output specifically, like markdown
-        //$xml = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $xml);
-        return $xml;
+        return $this->x;
     }
 
     /**

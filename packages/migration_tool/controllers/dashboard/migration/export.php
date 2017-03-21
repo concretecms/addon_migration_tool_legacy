@@ -46,15 +46,26 @@ class DashboardMigrationExportController extends DashboardBaseController
                 header('Content-disposition: attachment; filename="export.xml"');
                 header('Content-type: "text/xml"; charset="utf8"');
             } else {
-                header('Content-type: text/xml');
+                //header('Content-type: "text/xml"');
             }
             // I feel like this html_entity_decode is risky but how else am I to get rid of the double
             // quoting &amp;amp; problem?
             // Never mind, this creates broken XML.
             //$xml = html_entity_decode($exporter->getContentXML(), ENT_NOQUOTES | ENT_XML1, APP_CHARSET);
             //$xml = $exporter->getContentXML();
-            echo $exporter->getContentXML();
+            //echo $exporter->getContentXML();
+
+            ob_start();
+            $dom = new DOMDocument("1.0", "UTF-8");
+            $dom->formatOutput = true;
+            $dom->loadXML($exporter->getExporter()->asXML());
+            echo $dom->saveXML();
+            $xml = ob_get_contents();
+            ob_end_clean();
+
+            print trim($xml);
             exit;
+
         } else {
             $this->view();
         }
