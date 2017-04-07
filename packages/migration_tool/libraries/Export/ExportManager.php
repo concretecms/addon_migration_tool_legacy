@@ -7,6 +7,7 @@ class ExportManager
         return array(
             'page',
             'stack',
+            'user',
         );
     }
 

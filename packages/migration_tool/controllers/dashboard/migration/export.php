@@ -39,14 +39,16 @@ class DashboardMigrationExportController extends DashboardBaseController
 
     public function export_batch_xml($id = null)
     {
+        Loader::library('3rdparty/ForceUTF8/Encoding', 'migration_tool');
         $batch = MigrationBatch::getByID($id);
         if (is_object($batch)) {
             $exporter = new MigrationBatchExporter($batch);
             if ($_REQUEST['download']) {
-                header('Content-disposition: attachment; filename="export.xml"');
+                header('Content-Disposition: attachment; filename="export.xml"');
                 header('Content-type: "text/xml"; charset="utf8"');
             } else {
-                //header('Content-type: "text/xml"');
+                header('Content-type: "text"');
+                header('Content-Disposition: inline; filename="export.xml"');
             }
             // I feel like this html_entity_decode is risky but how else am I to get rid of the double
             // quoting &amp;amp; problem?
@@ -56,14 +58,11 @@ class DashboardMigrationExportController extends DashboardBaseController
             //echo $exporter->getContentXML();
 
             ob_start();
-            $dom = new DOMDocument("1.0", "UTF-8");
-            $dom->formatOutput = true;
-            $dom->loadXML($exporter->getExporter()->asXML());
-            echo $dom->saveXML();
+            echo $exporter->getExporter()->asXML();
             $xml = ob_get_contents();
             ob_end_clean();
 
-            print trim($xml);
+            print \ForceUTF8\Encoding::toUTF8(trim($xml));
             exit;
 
         } else {
