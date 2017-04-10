@@ -104,8 +104,6 @@ class UserExportType extends AbstractExportType
 
                 unset($user);
                 unset($category);
-
-                return $node;
             }
         }
     }
