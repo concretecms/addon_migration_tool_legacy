@@ -69,7 +69,7 @@ class UserExportType extends AbstractExportType
                     $node->addAttribute('timezone', $timezone);
                 }
 
-                if ($language = $user->getUserDefaultLanguage()) {
+                if ($language = $user->getUserObject()->getUserDefaultLanguage()) {
                     $node->addAttribute('language', $language);
                 }
 
@@ -104,10 +104,9 @@ class UserExportType extends AbstractExportType
 
                 unset($user);
                 unset($category);
-
-                return $node;
             }
         }
+        return $element;
     }
 
     public function getResults($query)
