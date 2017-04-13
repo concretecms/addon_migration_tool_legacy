@@ -112,6 +112,7 @@ class UserExportType extends AbstractExportType
     public function getResults($query)
     {
         $list = new UserList();
+        $list->sortBy('uName', 'asc');
 
         $keywords = $query['keywords'];
         $gID = $query['gID'];
