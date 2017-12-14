@@ -93,7 +93,7 @@ class DashboardMigrationExportController extends DashboardBaseController
             }
             $filename = $temp.'/'.$vh->getString().'.zip';
             $files = array();
-            $filenames = array();
+            $prefixes = array();
             foreach ((array) $_POST['batchFileID'] as $fID) {
                 $f = File::getByID(intval($fID));
                 if ($f->isError()) {
@@ -101,10 +101,10 @@ class DashboardMigrationExportController extends DashboardBaseController
                 }
                 $fp = new Permissions($f);
                 if ($fp->canRead()) {
-                    if (!in_array(basename($f->getPath()), $filenames) && file_exists($f->getPath())) {
+                    if (!in_array($f->getPath(), $files) && file_exists($f->getPath())) {
                         $files[] = $f->getPath();
+                        $prefixes[] = $f->getPrefix();
                     }
-                    $filenames[] = basename($f->getPath());
                 }
             }
             if (empty($files)) {
@@ -116,20 +116,14 @@ class DashboardMigrationExportController extends DashboardBaseController
                 if ($res !== true) {
                     throw new Exception(t('Could not open with ZipArchive::CREATE'));
                 }
-                foreach ($files as $f) {
-                    $zip->addFile($f, basename($f));
+                for ($i = 0; $i < count($files); $i++) {
+                    $f = $files[$i];
+                    $prefix = $prefixes[$i];
+                    $zip->addFile($f, $prefix . '_' . basename($f));
                 }
                 $zip->close();
             } else {
-                $exec = escapeshellarg(DIR_FILES_BIN_ZIP).' -j '.escapeshellarg($filename);
-                foreach ($files as $f) {
-                    $exec .= ' '.escapeshellarg($f);
-                }
-                $exec .= ' 2>&1';
-                @exec($exec, $output, $rc);
-                if ($rc !== 0) {
-                    throw new Exception(t('External zip failed. Error description: %s', implode("\n", $output)));
-                }
+                throw new \Exception(t('ZipArchive extension required.'));
             }
             $fh->forceDownload($filename);
         }
