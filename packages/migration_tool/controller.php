@@ -5,8 +5,8 @@ defined('C5_EXECUTE') or die(_('Access Denied.'));
 class MigrationToolPackage extends Package
 {
     protected $pkgHandle = 'migration_tool';
-    protected $appVersionRequired = '5.6.3.5b1';
-    protected $pkgVersion = '0.9.7';
+    protected $appVersionRequired = '5.6.4.0';
+    protected $pkgVersion = '0.9.8';
 
     public function getPackageDescription()
     {
