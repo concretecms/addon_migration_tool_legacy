@@ -2,7 +2,7 @@
 
 defined('C5_EXECUTE') or die(_('Access Denied.'));
 
-class MigrationBatch extends Object
+class MigrationBatch extends ConcreteObject
 {
     protected $id;
     protected $notes;
