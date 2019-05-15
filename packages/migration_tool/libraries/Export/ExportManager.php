@@ -24,7 +24,7 @@ class ExportManager
     {
         $drivers = array();
         foreach ($this->getDriverArray() as $driver) {
-            $class = Object::camelcase($driver).'ExportType';
+            $class = ConcreteObject::camelcase($driver).'ExportType';
             $drivers[] = new $class();
         }
 
