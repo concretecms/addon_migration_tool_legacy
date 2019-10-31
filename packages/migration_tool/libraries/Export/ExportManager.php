@@ -8,6 +8,8 @@ class ExportManager
             'page',
             'stack',
             'user',
+            'file',
+            'file_set',
         );
     }
 
@@ -22,8 +24,11 @@ class ExportManager
 
     public function getDrivers()
     {
+        Loader::library('Export/Type/FileSetExportType');
+        Loader::library('Export/Type/FileExportType');
         $drivers = array();
         foreach ($this->getDriverArray() as $driver) {
+
             $class = ConcreteObject::camelcase($driver).'ExportType';
             $drivers[] = new $class();
         }
@@ -31,3 +36,4 @@ class ExportManager
         return $drivers;
     }
 }
+    
