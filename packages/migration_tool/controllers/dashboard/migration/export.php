@@ -281,9 +281,7 @@ class DashboardMigrationExportController extends DashboardBaseController
             exit;
         }
 
-        $r = new EditResponse();
-        $r->setError($this->error);
-        $r->outputJSON();
+        Loader::helper('ajax')->sendError($this->error);
     }
 
     public function view()
